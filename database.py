@@ -13,6 +13,7 @@ class Personal_details(Base):
     last_name = Column('lastname', String)
     email = Column('email', String)
     dob = Column('dob', String)
+    age = Column('age', Integer)
     days = Column('days', String)
     months = Column('months', String)
     years = Column('years', String)
@@ -21,11 +22,12 @@ class Personal_details(Base):
     percentage = Column('percentage', String)
     aadhar_no = Column('aadhar_no', String)
 
-    def __init__(self, first_name, last_name, email, dob, days, months, years, marks, outof, percentage, aadhar_no):
+    def __init__(self, first_name, last_name, email, dob, age, days, months, years, marks, outof, percentage, aadhar_no):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.dob = dob
+        self.age = age
         self.days = days
         self.months = months
         self.years = years
@@ -33,7 +35,8 @@ class Personal_details(Base):
         self.outof = outof
         self.percentage = percentage
         self.aadhar_no = aadhar_no
-engine = create_engine('sqlite:///database.db')
+engine = create_engine('sqlite:///database.db', echo=True)
+Base.metadata.create_all(engine)
 Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
@@ -56,12 +59,16 @@ def add_form_data(personal_details):
 
 def get_data():
     arr = []
-    data = session.query(Personal_details).all()
-    print(data, type(data))
-    for detail in data:
-        print(detail)
-        arr.append(detail)
-
+    try:
+        data = session.query(Personal_details).all()
+        print(data, type(data))
+        for detail in data:
+            print(detail)
+            arr.append(detail)
+    except:
+        return Exception("No Data")
+    finally:
+        session.close()
     print(arr)
     return arr
 

@@ -4,7 +4,8 @@ from datetime import datetime
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 from flask import Flask, render_template, request
-
+from datetime import *; from dateutil.relativedelta import *
+import calendar
 from formapp.database import Personal_details, add_form_data, get_data
 
 app = Flask(__name__, template_folder='templates')
@@ -27,19 +28,26 @@ def index():
 
         dob_year = datetime.strptime(dob, "%Y-%m-%d")
         present = datetime.now()
-        days = present.day - dob_year.day
-        months = present.month - dob_year.month
-        years = present.year - dob_year.year
         percentage = (float(marks) / float(outof)) * 100
-        print(first_name, last_name, email, dob,days, months, years, marks, outof, percentage, aadhar_no)
+        if dob_year <= datetime.now():
+        # days = present.day - dob_year.day
+        # months = present.month - dob_year.month
+        # years = present.year - dob_year.year
+            total_time = relativedelta(present, dob_year)
+            print(total_time)
+            age = total_time.years
+            personal_details = Personal_details(first_name, last_name, email, dob, age, total_time.days,
+                                                total_time.months, total_time.years, marks, outof, percentage, aadhar_no)
 
-        personal_details = Personal_details(first_name, last_name, email, dob, days,
-                                            months, years, marks, outof, percentage, aadhar_no)
+            add_form_data(personal_details)
+        else:
+            raise Exception("Date selected is greater than current date")
+
+        print(first_name, last_name, email, dob, total_time, total_time.days, total_time.months, total_time.years, marks, outof, percentage, aadhar_no)
 
 
-        add_form_data(personal_details)
         all_data = get_data()
-        return render_template('index.html', detail_msg='Details', all_data=all_data, first_name=first_name, last_name=last_name,email=email, dob=dob, days=days, months=months, years=years, percentage=percentage, aadhar_no=aadhar_no)
+        return render_template('index.html', detail_msg='Details', all_data=all_data, first_name=first_name, last_name=last_name,email=email, dob=dob, age=age, days=total_time.days, months=total_time.months, years=total_time.years, percentage=percentage, aadhar_no=aadhar_no)
 
 
 @app.route('/form', methods=['POST'])
