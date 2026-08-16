@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card top-50 right-50 align-center " style="align-self: center; width: 40%; height: 50%; left: 30%; top: 100px" >
+  <div class="card-body align-center " style="align-self: auto; justify-content: center; text-align: center
+">
+    <form method="post" action="{{url_for('login')}}">
+   <div class="mb-3 row">
+  <label for="username" class="col-sm-2 col-form-label">User Name</label>
+  <div class="col-sm-10">
+    <input type="text" class="form-control" id="username" name="username" placeholder="username">
+  </div>
+</div>
+
+    <div class="mb-3 row">
+  <label for="password" class="col-sm-2 col-form-label">Password</label>
+  <div class="col-sm-10">
+    <input type="password"  class="form-control" id="password" name="password" placeholder="******">
+  </div>
+</div>
+
+
+  <div class="mb-3 row" style="justify-content: center;">
+  <div class="col-sm-10">
+    <button type="submit"  class="form-control bg-primary justify-content-center " id="login" name="login">Login</button>
+  </div>
+</div>
+      </form>
+</div>
+  </div>
+{% endblock %}
