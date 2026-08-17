@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+   .dashboard-page {
+       display: flex;
+       min-height: 100vh;
+       width: 100%;
+       background: #f3f4f6;
+   }
+
+   .sidebar {
+       width: 260px;
+       min-height: 100vh;
+       background: #1f2937;
+       color: #ffffff;
+       padding: 24px 18px;
+       box-sizing: border-box;
+       display: flex;
+       flex-direction: column;
+       gap: 20px;
+   }
+
+   .sidebar h5 {
+       margin: 0;
+       font-size: 1.5rem;
+       font-weight: 700;
+       letter-spacing: 0.04em;
+   }
+
+   .sidebar nav ul {
+       list-style: none;
+       padding: 0;
+       margin: 0;
+       display: flex;
+       flex-direction: column;
+       gap: 12px;
+   }
+
+   .sidebar nav a {
+       display: block;
+       color: #e5e7eb;
+       text-decoration: none;
+       padding: 10px 12px;
+       border-radius: 8px;
+       transition: 0.2s ease;
+   }
+
+   .sidebar nav a:hover {
+       background: rgba(255, 255, 255, 0.12);
+       color: #ffffff;
+   }
+
+   .content-panel {
+       flex: 1;
+       display: flex;
+       flex-direction: column;
+       min-height: 100vh;
+   }
+
+   .topbar {
+       height: 70px;
+       padding: 0 24px;
+       background: #e5e7eb;
+       display: flex;
+       align-items: center;
+       justify-content: space-between;
+       border-bottom: 1px solid #d1d5db;
+       box-sizing: border-box;
+   }
+
+   .topbar h1 {
+       font-size: 1.5rem;
+       margin: 0;
+       color: #111827;
+   }
+
+   .topbar a {
+       color: #111827;
+       text-decoration: none;
+       font-weight: 600;
+   }
+
+   .main-grid {
+       display: grid;
+       grid-template-columns: repeat(2, minmax(280px, 1fr));
+       gap: 24px;
+       padding: 24px;
+       box-sizing: border-box;
+       flex: 1;
+   }
+
+   .card-panel {
+       background: #ffffff;
+       border-radius: 16px;
+       box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+       padding: 20px;
+       box-sizing: border-box;
+   }
+
+   .full-width {
+       grid-column: 1 / -1;
+   }
+
+   .card-panel h2 {
+       margin: 0 0 18px;
+       font-size: 1.3rem;
+       color: #111827;
+   }
+
+   .card-panel .form-label {
+       font-weight: 600;
+   }
+
+   .form-row {
+       display: flex;
+       gap: 12px;
+       align-items: end;
+       flex-wrap: wrap;
+   }
+
+   .form-row .field {
+       flex: 1;
+       min-width: 150px;
+   }
+
+   .list-group {
+       margin: 0;
+       padding: 0;
+       list-style: none;
+   }
+
+   .list-group-item {
+       padding: 10px 12px;
+       border-bottom: 1px solid #e5e7eb;
+       color: #374151;
+   }
+
+   .list-group-item:last-child {
+       border-bottom: none;
+   }
+
+   .table-wrap {
+       overflow-x: auto;
+   }
+
+   @media (max-width: 900px) {
+       .dashboard-page {
+           flex-direction: column;
+       }
+
+       .sidebar {
+           width: 100%;
+           min-height: auto;
+       }
+
+       .main-grid {
+           grid-template-columns: 1fr;
+       }
+   }
+</style>
+
+<div class="dashboard-page">
+   <aside class="sidebar">
+       <div>
+           <h5>Menu</h5>
+       </div>
+       <nav>
+           <ul>
+               <li><a href="{{url_for('dashboard')}}">Dashboard</a></li>
+               <li><a href="">All Data</a></li>
+           </ul>
+       </nav>
+   </aside>
+
+   <div class="content-panel">
+       <div class="topbar">
+           <h1>{{current_user}}</h1>
+           <a href="{{url_for('logout')}}">Logout</a>
+       </div>
+
+       <div class="main-grid">
+           <div class="card-panel">
+               <h2>Details Form</h2>
+               <form method="post" class="needs-validation" action="{{url_for('dashboard')}}" novalidate>
+                   <div class="mb-3">
+                       <label for="first_name" class="form-label">First Name</label>
+                       <input type="text" class="form-control" id="first_name" name="first_name" required>
+                       <div class="invalid-feedback">Please add First Name</div>
+                   </div>
+                   <div class="mb-3">
+                       <label for="last_name" class="form-label">Last Name</label>
+                       <input type="text" class="form-control" id="last_name" name="last_name" required>
+                       <div class="invalid-feedback">Please add Last Name</div>
+                   </div>
+                   <div class="mb-3">
+                       <label for="email" class="form-label">Email</label>
+                       <input type="text" class="form-control" id="email" name="email" required>
+                       <div class="invalid-feedback">Please add Email</div>
+                   </div>
+                   <div class="mb-3">
+                       <label for="dob" class="form-label">DOB</label>
+                       <input type="date" class="form-control" id="dob" name="dob" required>
+                       <div class="invalid-feedback">Please add DOB</div>
+                   </div>
+                   <div class="form-row mb-3">
+                       <div class="field">
+                           <label for="marks" class="form-label">Marks</label>
+                           <input type="text" class="form-control" id="marks" name="marks" required>
+                       </div>
+                       <div class="field">
+                           <label for="outof" class="form-label">Out Of</label>
+                           <input type="text" class="form-control" id="outof" name="outof" required>
+                       </div>
+                   </div>
+                   <div class="mb-3">
+                       <label for="aadhar_no" class="form-label">Aadhar No</label>
+                       <input type="text" class="form-control" id="aadhar_no" name="aadhar_no" required>
+                       <div class="invalid-feedback">Please add Aadhar No</div>
+                   </div>
+                   <button type="submit" class="btn btn-primary">Submit</button>
+               </form>
+           </div>
+
+           <div class="card-panel">
+               <h2>Details</h2>
+               <ul class="list-group">
+                   <li class="list-group-item">First Name: {{first_name}}</li>
+                   <li class="list-group-item">Last Name: {{last_name}}</li>
+                   <li class="list-group-item">Email: {{email}}</li>
+                   <li class="list-group-item">DOB: {{dob}}</li>
+                   <li class="list-group-item">Age: {{age}}</li>
+                   <li class="list-group-item">Days: {{days}}</li>
+                   <li class="list-group-item">Months: {{months}}</li>
+                   <li class="list-group-item">Years: {{years}}</li>
+                   <li class="list-group-item">Percentage: {{percentage}}%</li>
+                   <li class="list-group-item">Aadhar No: {{aadhar_no}}</li>
+               </ul>
+           </div>
+
+           <div class="card-panel full-width">
+               <h2>All Details</h2>
+               <div class="table-wrap">
+                   <table class="table table-bordered mb-0">
+                       <thead>
+                       <tr>
+                           <th scope="col">ID</th>
+                           <th scope="col">First Name</th>
+                           <th scope="col">Last Name</th>
+                           <th scope="col">Email</th>
+                           <th scope="col">DOB</th>
+                           <th scope="col">Age</th>
+                           <th scope="col">Days</th>
+                           <th scope="col">Months</th>
+                           <th scope="col">Years</th>
+                           <th scope="col">Marks</th>
+                           <th scope="col">Out Of</th>
+                           <th scope="col">Percentage</th>
+                           <th scope="col">Aadhar No</th>
+                       </tr>
+                       </thead>
+                       <tbody>
+                       {% for form in all_data %}
+                       <tr>
+                           <th scope="row">{{form.id}}</th>
+                           <td>{{form.first_name}}</td>
+                           <td>{{form.last_name}}</td>
+                           <td>{{form.email}}</td>
+                           <td>{{form.dob}}</td>
+                           <td>{{form.age}}</td>
+                           <td>{{form.days}}</td>
+                           <td>{{form.months}}</td>
+                           <td>{{form.years}}</td>
+                           <td>{{form.marks}}</td>
+                           <td>{{form.outof}}</td>
+                           <td>{{form.percentage}}</td>
+                           <td>{{form.aadhar_no}}</td>
+                       </tr>
+                       {% endfor %}
+                       </tbody>
+                   </table>
+               </div>
+           </div>
+       </div>
+   </div>
+</div>
+
+<script>
+   (() => {
+       'use strict'
+
+       const forms = document.querySelectorAll('.needs-validation')
+
+       Array.from(forms).forEach(form => {
+           form.addEventListener('submit', event => {
+               if (!form.checkValidity()) {
+                   event.preventDefault()
+                   event.stopPropagation()
+               }
+
+               form.classList.add('was-validated')
+           }, false)
+       })
+   })()
+
+   const response = fetch('{{url_for('form')}}')
+   console.log(response)
+</script>
+{% endblock %}
