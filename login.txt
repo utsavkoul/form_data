@@ -1,0 +1,17 @@
+login
+register
+password hash
+Models
+DB config
+login required
+validation
+errors
+dynamic routing
+form
+save data
+validations
+backend login, data update, calculations
+all data
+html
+JavaScript
+database health
