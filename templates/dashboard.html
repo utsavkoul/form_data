@@ -167,20 +167,31 @@
        <nav>
            <ul>
                <li><a href="{{url_for('dashboard')}}">Dashboard</a></li>
-               <li><a href="">All Data</a></li>
+               <li><a href="{{url_for('all_data')}}">All Data</a></li>
            </ul>
        </nav>
    </aside>
+
 
    <div class="content-panel">
        <div class="topbar">
            <h1>{{current_user}}</h1>
            <a href="{{url_for('logout')}}">Logout</a>
        </div>
-
+{% block body %}
        <div class="main-grid">
            <div class="card-panel">
                <h2>Details Form</h2>
+               {%  if errors %}
+                   <div class="alert alert-danger" role="alert">
+                       <ul>
+                           {% for error in errors %}
+                               <li>{{ error }}</li>
+                           {% endfor %}
+                       </ul>
+                   </div>
+               {% endif %}
+
                <form method="post" class="needs-validation" action="{{url_for('dashboard')}}" novalidate>
                    <div class="mb-3">
                        <label for="first_name" class="form-label">First Name</label>
@@ -237,52 +248,12 @@
                </ul>
            </div>
 
-           <div class="card-panel full-width">
-               <h2>All Details</h2>
-               <div class="table-wrap">
-                   <table class="table table-bordered mb-0">
-                       <thead>
-                       <tr>
-                           <th scope="col">ID</th>
-                           <th scope="col">First Name</th>
-                           <th scope="col">Last Name</th>
-                           <th scope="col">Email</th>
-                           <th scope="col">DOB</th>
-                           <th scope="col">Age</th>
-                           <th scope="col">Days</th>
-                           <th scope="col">Months</th>
-                           <th scope="col">Years</th>
-                           <th scope="col">Marks</th>
-                           <th scope="col">Out Of</th>
-                           <th scope="col">Percentage</th>
-                           <th scope="col">Aadhar No</th>
-                       </tr>
-                       </thead>
-                       <tbody>
-                       {% for form in all_data %}
-                       <tr>
-                           <th scope="row">{{form.id}}</th>
-                           <td>{{form.first_name}}</td>
-                           <td>{{form.last_name}}</td>
-                           <td>{{form.email}}</td>
-                           <td>{{form.dob}}</td>
-                           <td>{{form.age}}</td>
-                           <td>{{form.days}}</td>
-                           <td>{{form.months}}</td>
-                           <td>{{form.years}}</td>
-                           <td>{{form.marks}}</td>
-                           <td>{{form.outof}}</td>
-                           <td>{{form.percentage}}</td>
-                           <td>{{form.aadhar_no}}</td>
-                       </tr>
-                       {% endfor %}
-                       </tbody>
-                   </table>
-               </div>
-           </div>
        </div>
    </div>
+
+    {%  endblock %}
 </div>
+
 
 <script>
    (() => {
@@ -302,7 +273,7 @@
        })
    })()
 
-   const response = fetch('{{url_for('form')}}')
-   console.log(response)
+   {#const response = fetch('{{url_for('form')}}')#}
+   {#console.log(response)#}
 </script>
 {% endblock %}

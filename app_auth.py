@@ -6,11 +6,13 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import *; from dateutil.relativedelta import *
 import calendar
+
 # from database_mysql import Personal_details, add_form_data, get_data
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user, UserMixin
 import re
 
+from sqlalchemy import delete
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 from urllib.parse import urlparse
@@ -83,6 +85,18 @@ def create_app():
         db.session.add(personal_details)
         db.session.commit()
 
+    def update_user_data(data):
+        for d in data:
+            dob = d.dob
+            dob_year = datetime.strptime(dob, "%Y-%m-%d")
+            present = datetime.now()
+            total_time = relativedelta(present, dob_year)
+            print(total_time)
+            d.age = total_time.years
+            d.days = total_time.days
+            d.months = total_time.months
+            d.years = total_time.years
+        return data
 
 
     def is_safe_url_path(target):
@@ -118,7 +132,7 @@ def create_app():
                         return redirect(next_url)
                     return redirect(url_for('dashboard'))
                 else:
-                    flash("Username and Password is incorrect", 'danger')
+                    flash("Username or Password is incorrect", 'danger')
         #         flash message
         return render_template("login.html", errors=errors)
     #   check if username and password in database
@@ -171,9 +185,11 @@ def create_app():
     @app.route('/dashboard', methods=['GET', 'POST'])
     @login_required
     def dashboard():
+        global age, total_time
+        errors =[]
         if request.method == 'GET':
             pass
-            data = get_data(current_user.id)
+            data = update_user_data(get_data(current_user.id))
             # return render_template('dashboard.html', data=data, detail_msg='Details', first_name='', last_name='',email='', dob='', days='', months='', years='', percentage='', aadhar_no='')data = get_data()
             return render_template('dashboard.html', all_data=data, detail_msg='Details', current_user=current_user.username, first_name='', last_name='',email='', dob='', days='', months='', years='', percentage='', aadhar_no='')
         if request.method == 'POST':
@@ -188,33 +204,46 @@ def create_app():
             dob_year = datetime.strptime(dob, "%Y-%m-%d")
             present = datetime.now()
             percentage = (float(marks) / float(outof)) * 100
+
             if dob_year <= datetime.now():
-            # days = present.day - dob_year.day
-            # months = present.month - dob_year.month
-            # years = present.year - dob_year.year
-                total_time = relativedelta(present, dob_year)
-                print(total_time)
-                age = total_time.years
-                personal_details = Personal_details(first_name, last_name, email, dob, age, total_time.days,
-                                                    total_time.months, total_time.years, marks, outof, percentage, aadhar_no, current_user.id)
+                # days = present.day - dob_year.day
+                            # months = present.month - dob_year.month
+                            # years = present.year - dob_year.year
+                    if not errors:
+                        total_time = relativedelta(present, dob_year)
+                        print(total_time)
+                        age = total_time.years
+                        aadhar_no = re.sub(r"^\d{8}(\d{4})$", r"XXXXXXXX\1", aadhar_no)
+                        personal_details = Personal_details(first_name, last_name, email, dob, age, total_time.days,
+                                                                        total_time.months, total_time.years, marks, outof, percentage, aadhar_no, current_user.id)
+                        print(first_name, last_name, email, dob, total_time, total_time.days, total_time.months, total_time.years, marks, outof, percentage, aadhar_no, current_user.id)
 
-                add_form_data(personal_details)
+                        add_form_data(personal_details)
+
             else:
-                raise Exception("Date selected is greater than current date")
+                    errors.append("Date selected is greater than current date")
+            all_data = update_user_data(get_data(current_user.id))
+            return render_template('dashboard.html', errors=errors, current_user=current_user.username,
+                                       detail_msg='Details', all_data=all_data, first_name=first_name,
+                                       last_name=last_name, email=email, dob=dob, age=age, days=total_time.days,
+                                       months=total_time.months, years=total_time.years, percentage=percentage,
+                                       aadhar_no=aadhar_no)
 
-            print(first_name, last_name, email, dob, total_time, total_time.days, total_time.months, total_time.years, marks, outof, percentage, aadhar_no)
 
 
-            all_data = get_data(current_user.id)
-            return render_template('dashboard.html', current_user=current_user.username, detail_msg='Details', all_data=all_data, first_name=first_name, last_name=last_name,email=email, dob=dob, age=age, days=total_time.days, months=total_time.months, years=total_time.years, percentage=percentage, aadhar_no=aadhar_no)
-
-
-    @app.route('/form', methods=['POST'])
+    @app.route('/all-data', methods=['GET'])
     @login_required
-    def form():
-        data = 'get_data()'
-        return render_template('dashboard.html', data=data, detail_msg='Details', first_name='', last_name='', email='', dob='',
-                               days='', months='', years='', percentage='', aadhar_no='')
+    def all_data():
+
+
+        data = update_user_data(get_data(current_user.id))
+        return render_template('all_data.html', data=data, current_user=current_user.username)
+    @app.route('/edit-form/<int:id>', methods=['GET'])
+    @login_required
+    def edit_form(id):
+        db.session.execute(delete(Personal_details).where(Personal_details.id == id))
+        db.session.commit()
+        return "Deleted Successfully"
     @app.route("/test", methods=['GET'])
     @login_required
     def test():
